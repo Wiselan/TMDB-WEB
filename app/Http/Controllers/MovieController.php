@@ -12,7 +12,7 @@ class MovieController extends Controller
         $imageBaseURL = env('MOVIE_DB_IMAGE_BASE_URL');
         $apiKey       = env('MOVIE_DB_API_KEY');
         $max_image    = 1;
-        $max_image_item = 1;
+        $max_image_item = 3;
 
         // Mengambil/Hit API untuk banner
         $bannerResponse = Http::get("{$baseURL}/trending/movie/week", [
@@ -40,14 +40,30 @@ class MovieController extends Controller
             'api_key' => $apiKey
         ]);
 
-        // Persiapan variable
+         // Persiapan Variabel
+         $loopMovieArray = [];
+
+         // check API response
+         if($loopMovieResponse->successful()){
+             $resultArray = $loopMovieResponse->object()->results;
+             if(isset($resultArray)){
+                 // Looping data image
+                 foreach($resultArray as $item){
+                     array_push($loopMovieArray, $item);
+                     if(count($loopMovieArray) == $max_image_item){
+                         break;
+                     }
+                 }
+             }
+         }
 
 
         return view('home', [
             'baseURL     ' => $baseURL,
             'imageBaseURL' => $imageBaseURL,
             'apikey'       => $apiKey,
-            'banner'       => $bannerArray, 
+            'banner'       => $bannerArray,
+            'loopMovies'   => $loopMovieArray
         ]);
     }       
 }
